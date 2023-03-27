@@ -1,4 +1,4 @@
-from flask import Flask, render_template, redirect, url_for, request, escape, flash, abort
+from flask import Flask, render_template, redirect, url_for, request, flash, abort, Blueprint
 # lib tha handles the main db actions: create, insert, update, delete
 from flask_sqlalchemy import SQLAlchemy
 from flask_ckeditor import CKEditor
@@ -11,22 +11,33 @@ import datetime
 from functools import wraps
 from forms import CreatePostForm, RegisterForm, LoginForm, CommentForm
 # libs required to make the relationship between the tables
-from sqlalchemy import Table, Column, Integer, ForeignKey
+from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from flask_gravatar import Gravatar
+import os
 
 Base = declarative_base()
+#
+# # CREATE THE BLUEPRINT
+# main = Blueprint('main', __name__)
 
 
-app = Flask(__name__)
-app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+# CREATE THE FLASK APP
+def create_app():
+    app = Flask(__name__)
+    app.config['SECRET_KEY'] = '8BYkEfBA6O6donzWlSihBXox7C0sKR6b'
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ.get("DATABASE_URL")
+    app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+    return app
+
+
+app = create_app()
 ckeditor = CKEditor(app)
 
 
 # CONNECT TO DB
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///blog.db'
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db = SQLAlchemy(app)
 
 
